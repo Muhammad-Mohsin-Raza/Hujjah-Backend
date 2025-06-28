@@ -132,18 +132,20 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # React dev server
     "http://127.0.0.1:5173",
+    "http://16.16.70.4:8001",
+    "https://sing-up-hojjah.vercel.app/"
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'ar'
+
 
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
-
-USE_TZ = True
+USE_L10N = True
 
 
 # Static files (CSS, JavaScript, Images)
