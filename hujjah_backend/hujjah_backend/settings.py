@@ -31,6 +31,7 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     ".vercel.app",  # allow subdomains from Vercel
+    'e5b8-16-16-70-4.ngrok-free.app'
 ]
 
 
