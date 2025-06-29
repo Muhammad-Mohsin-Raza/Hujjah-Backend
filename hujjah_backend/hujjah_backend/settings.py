@@ -133,7 +133,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # React dev server
     "http://127.0.0.1:5173",
     "http://16.16.70.4:8001",
-    "https://sing-up-hojjah.vercel.app/"
+    "https://sing-up-hojjah.vercel.app",
+    "https://jasless-platform-9hk6.vercel.app"
 ]
 
 # Internationalization
