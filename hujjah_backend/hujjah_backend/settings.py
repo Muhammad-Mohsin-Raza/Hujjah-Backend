@@ -129,13 +129,13 @@ REST_FRAMEWORK = {
 }
 
 
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # React dev server
-    "http://127.0.0.1:5173",
-    "http://16.16.70.4:8001",
-    "https://sing-up-hojjah.vercel.app",
-    "https://jasless-platform-9hk6.vercel.app"
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:5173",  # React dev server
+#     "http://127.0.0.1:5173",
+#     "http://16.16.70.4:8001",
+#     "https://sing-up-hojjah.vercel.app",
+#     "https://jasless-platform-9hk6.vercel.app"
+# ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
@@ -164,3 +164,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=150),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+
+
+CORS_ALLOW_ALL_ORIGINS = True
