@@ -26,7 +26,12 @@ SECRET_KEY = 'django-insecure-ni9c=@ah5_ehn6mb!vhsa+#r^597n3bs(348n!11!v8p3zd2&i
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "16.16.70.4",
+    "localhost",
+    "127.0.0.1",
+    ".vercel.app",  # allow subdomains from Vercel
+]
 
 
 # Application definition
@@ -49,6 +54,9 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'users.User'
+
+CORS_ALLOW_ALL_ORIGINS = True
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -164,6 +172,3 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=150),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
-
-
-CORS_ALLOW_ALL_ORIGINS = True
