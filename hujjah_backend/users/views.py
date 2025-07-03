@@ -152,6 +152,7 @@ class AssistantCreateView(APIView):
                 return Response({
                     'msg': 'Assistant created successfully.',
                     'assistant': {
+                        'id': assistant.id,
                         'username': assistant.username,
                         'email': assistant.email,
                         'phone_number': assistant.phone_number,
