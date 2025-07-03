@@ -15,7 +15,8 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
+from django.views.generic import TemplateView
 
 
 urlpatterns = [
@@ -27,4 +28,9 @@ urlpatterns = [
     path('api/defendant/', include('defendant.urls')),
     path('api/casenote/', include('case_note.urls')),
     path('api/task/', include('task.urls')),
+    # Route for signup app - must be before the catch-all route
+    re_path(r'^signup/?$', TemplateView.as_view(template_name="signup.html"), name="signup"),
+    
+    # Catch-all route for main app
+    re_path(r'^.*$', TemplateView.as_view(template_name="index.html")),
 ]
