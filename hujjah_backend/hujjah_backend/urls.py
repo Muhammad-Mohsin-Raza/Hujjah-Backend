@@ -29,8 +29,9 @@ urlpatterns = [
     path('api/casenote/', include('case_note.urls')),
     path('api/task/', include('task.urls')),
     # Route for signup app - must be before the catch-all route
-    re_path(r'^signup/?$', TemplateView.as_view(template_name="signup.html"), name="signup"),
-    
-    # Catch-all route for main app
-    re_path(r'^.*$', TemplateView.as_view(template_name="index.html")),
+    re_path(r'^signup/?$',
+            TemplateView.as_view(template_name="signup.html"), name="signup"),
+
+    # Catch-all route ONLY for frontend paths, exclude /api/
+    re_path(r'^(?!api/).*$', TemplateView.as_view(template_name="index.html")),
 ]
