@@ -64,6 +64,10 @@ class User(AbstractBaseUser):
         help_text="If this user is an assistant, link them to their lawyer."
     )
     is_active = models.BooleanField(default=True)
+    terms_accepted = models.BooleanField(
+        default=False,
+        help_text="Indicates whether the user has accepted the terms and conditions"
+    )
 
     REQUIRED_FIELDS = ['email', 'phone_number', 'password']
     USERNAME_FIELD = 'username'

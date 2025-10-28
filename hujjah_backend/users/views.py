@@ -36,6 +36,7 @@ class UserRegistrationView(APIView):
                     'email': user.email,
                     'phone_number': user.phone_number,
                     'role': user.role,
+                    'terms_accepted': user.terms_accepted,
                 },
                 'token': get_token(user)
             }, status=status.HTTP_201_CREATED)
@@ -61,6 +62,7 @@ class UserLoginView(APIView):
                     'email': user.email,
                     'phone_number': user.phone_number,
                     'role': user.role,
+                    'terms_accepted': user.terms_accepted,
                 },
                 'tokens': tokens
             }, status=status.HTTP_200_OK)
@@ -83,6 +85,7 @@ class UserWithClientsView(APIView):
                 "email": request.user.email,
                 "phone_number": request.user.phone_number,
                 "role": request.user.role,
+                "terms_accepted": request.user.terms_accepted,
                 "clients": client_data
             },
         }, status=status.HTTP_200_OK)
@@ -222,3 +225,32 @@ class AssistantListView(APIView):
         ]
 
         return Response({"assistants": data}, status=status.HTTP_200_OK)
+
+
+class AcceptTermsView(APIView):
+    """
+    Allows authenticated users to accept terms and conditions.
+    This endpoint updates the terms_accepted field to True.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            user = request.user
+            user.terms_accepted = True
+            user.save()
+
+            return Response({
+                "msg": "Terms and conditions accepted successfully.",
+                "user": {
+                    "id": user.id,
+                    "username": user.username,
+                    "terms_accepted": user.terms_accepted
+                }
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "detail": "An error occurred while updating terms acceptance.",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

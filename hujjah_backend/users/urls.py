@@ -1,5 +1,5 @@
 from django.urls import path
-from users.views import AssistantCreateView, AssistantListView, ToggleAssistantStatusView, UserRegistrationView, UserLoginView, UserWithClientsView, UserDeleteView, UserFullProfileView
+from users.views import AcceptTermsView, AssistantCreateView, AssistantListView, ToggleAssistantStatusView, UserRegistrationView, UserLoginView, UserWithClientsView, UserDeleteView, UserFullProfileView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -12,6 +12,7 @@ urlpatterns = [
     # path('delete/', UserDeleteView.as_view(), name='user-delete'),
     path('complete-user/', UserFullProfileView.as_view(),
          name='user-complete-data'),
+    path('accept-terms/', AcceptTermsView.as_view(), name='accept-terms'),
     #  Assistants paths
     path('assistants/create/', AssistantCreateView.as_view(),
          name='create-assistant'),
