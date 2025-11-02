@@ -47,7 +47,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "127.0.0.1",
     ".vercel.app",  # allow subdomains from Vercel
-    'e5b8-16-16-70-4.ngrok-free.app'
+    'e5b8-16-16-70-4.ngrok-free.app',
+    'https://hujjah-db.onrender.com'
 ]
 
 
@@ -92,7 +93,8 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'frontend/dist'),  # ✅ for main app index.html
+            # ✅ for main app index.html
+            os.path.join(BASE_DIR, 'frontend/dist'),
             os.path.join(BASE_DIR, 'frontend_signup/dist'),  # ✅ for signup app
         ],
         'APP_DIRS': True,

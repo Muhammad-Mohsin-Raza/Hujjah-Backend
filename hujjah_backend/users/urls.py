@@ -9,7 +9,7 @@ urlpatterns = [
     path('login/', UserLoginView.as_view(), name='login'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('me/', UserWithClientsView.as_view(), name='user-with-clients'),
-    # path('delete/', UserDeleteView.as_view(), name='user-delete'),
+    path('delete/', UserDeleteView.as_view(), name='user-delete'),
     path('complete-user/', UserFullProfileView.as_view(),
          name='user-complete-data'),
     path('accept-terms/', AcceptTermsView.as_view(), name='accept-terms'),
