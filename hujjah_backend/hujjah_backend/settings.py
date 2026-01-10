@@ -207,8 +207,7 @@ from celery.schedules import crontab
 CELERY_BEAT_SCHEDULE = {
     'cleanup-deleted-accounts-daily': {
         'task': 'users.tasks.cleanup_deleted_accounts',
-        # 'schedule': crontab(hour=2, minute=0),  # Run daily at 2 AM
-        'schedule': crontab(minute='*/1'),  # Run every minute
+        'schedule': crontab(hour=2, minute=0),  # Run daily at 2 AM
     },
 }
 
