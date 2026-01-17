@@ -68,6 +68,11 @@ class User(AbstractBaseUser):
         default=False,
         help_text="Indicates whether the user has accepted the terms and conditions"
     )
+    deletion_requested_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when user requested account deletion. Account will be deleted after 30 days if no login occurs."
+    )
 
     REQUIRED_FIELDS = ['email', 'phone_number', 'password']
     USERNAME_FIELD = 'username'

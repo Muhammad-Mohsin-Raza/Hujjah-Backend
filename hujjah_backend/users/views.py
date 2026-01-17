@@ -8,7 +8,7 @@ from users.permissions import IsOwnerOrAssistantReadOnly
 from users.utils import get_effective_user
 from .serializers import AssistantCreateSerializer, UserCompleteSerializer, UserRegistrationSerializer, UserLoginSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-from client.serializers import ClientSerializer
+from client.serializers import ClientSerializer, ClientFullProfileSerializer
 from rest_framework.permissions import IsAuthenticated
 from client.models import Client
 from django.shortcuts import get_object_or_404
@@ -52,6 +52,16 @@ class UserLoginView(APIView):
             if user.role == 'assistant' and not user.is_active:
                 raise PermissionDenied(
                     detail="Assistant account is disabled. Please contact the administrator.")
+
+            # Update last_login timestamp
+            from django.utils import timezone
+            user.last_login = timezone.now()
+            
+            # Clear deletion request if user logs in during grace period
+            if user.deletion_requested_at:
+                user.deletion_requested_at = None
+            
+            user.save()
 
             tokens = get_token(user)
 
@@ -252,5 +262,153 @@ class AcceptTermsView(APIView):
         except Exception as e:
             return Response({
                 "detail": "An error occurred while updating terms acceptance.",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RequestAccountDeletionView(APIView):
+    """
+    Allows authenticated users to request account deletion.
+    Account will be deleted after 30 days if no login occurs.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            from django.utils import timezone
+            user = request.user
+            
+            # Check if deletion is already requested
+            if user.deletion_requested_at:
+                return Response({
+                    "detail": "Account deletion already requested.",
+                    "deletion_requested_at": user.deletion_requested_at,
+                    "msg": "Your account is scheduled for deletion. Log in to cancel the request."
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Set deletion request timestamp
+            user.deletion_requested_at = timezone.now()
+            user.save()
+
+            return Response({
+                "msg": "Account deletion requested successfully. Your account will be deleted in 30 days if you don't log in.",
+                "deletion_requested_at": user.deletion_requested_at
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "detail": "An error occurred while requesting account deletion.",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CancelAccountDeletionView(APIView):
+    """
+    Allows authenticated users to cancel a pending account deletion request.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            user = request.user
+            
+            # Check if deletion request exists
+            if not user.deletion_requested_at:
+                return Response({
+                    "detail": "No pending deletion request found."
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Clear deletion request
+            user.deletion_requested_at = None
+            user.save()
+
+            return Response({
+                "msg": "Account deletion request cancelled successfully."
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "detail": "An error occurred while cancelling account deletion.",
+                "error": str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ExportUserDataView(APIView):
+    """
+    Export all user data securely in JSON format.
+    Excludes sensitive fields like password, ids (optional), and internal flags.
+    Structure:
+    {
+        "user": { ... },
+        "assistants": [ ... ],
+        "clients": [
+            {
+                ...,
+                "cases": [ ... ],
+                "tasks": [ ... ]
+            }
+        ]
+    }
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            current_user = request.user
+            
+            # Efficiently fetch all related data
+            # Use prefetch_related for reverse foreign keys
+            user = User.objects.prefetch_related(
+                'assistants',
+                Prefetch(
+                    'clients',
+                    queryset=Client.objects.prefetch_related(
+                        'tasks',
+                        Prefetch(
+                            'cases',
+                            queryset=Case.objects.select_related('defendant').prefetch_related('notes')
+                        )
+                    )
+                )
+            ).get(id=current_user.id)
+
+            # Manual serialization for privacy control
+            user_data = {
+                "username": user.username,
+                "email": user.email,
+                "phone_number": user.phone_number,
+                "role": user.role,
+                "terms_accepted": user.terms_accepted,
+                "created_at": user.created_at,
+            }
+
+            # Assistants
+            assistants_data = [
+                {
+                    "username": a.username,
+                    "email": a.email,
+                    "phone_number": a.phone_number,
+                    "is_active": a.is_active,
+                    "role": a.role
+                }
+                for a in user.assistants.all()
+            ]
+
+            # Clients (using full profile serializer which includes cases and tasks)
+            # We filter out sensitive fields from the serialized data if needed
+            clients_serializer = ClientFullProfileSerializer(user.clients.all(), many=True)
+            clients_data = clients_serializer.data
+
+            response_data = {
+                "user_profile": user_data,
+                "assistants": assistants_data,
+                "clients": clients_data
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                "detail": "An error occurred while exporting data.",
                 "error": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
