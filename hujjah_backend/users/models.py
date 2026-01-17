@@ -50,7 +50,7 @@ class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(
         max_length=15, unique=True, validators=[validate_saudi_phone])
-    role = models.CharField(max_length=10, choices=Role, default=Role.USER)
+    role = models.CharField(max_length=10, choices=Role.choices, default=Role.USER)
     username = models.CharField(max_length=200, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
